@@ -65,7 +65,7 @@ cd "D:\Programs\daily_paper_agent"
 5. “添加参数”填写（需要根据你的实际目录修改）：
 
    ```text
-   /c "D:\Programs\daily_paper_agent\run_daily.bat"
+   /c "D:\Programs\daily_paper_agent\run_now.bat"
    ```
 
 6. “起始于”填写项目目录：
