@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+agent.log
+scheduler.log
+history.json
+feedback.jsonl
+.agent.lock
+reports/
+.env
+*.tmp

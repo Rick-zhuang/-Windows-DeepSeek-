@@ -1,0 +1,69 @@
+{
+  "research_focus": "AI × 化学与分子建模：GNN、三维分子/核酸结构、等变网络、扩散式构象生成、AI 酶设计与催化、G4 结构建模",
+  "search_queries": [
+    "graph neural network molecular structure",
+    "molecular conformation diffusion model",
+    "enzyme design machine learning catalysis",
+    "G-quadruplex DNA structure prediction"
+  ],
+  "keywords": [
+    "graph neural network",
+    "GNN",
+    "molecular structure",
+    "molecular conformation",
+    "diffusion model",
+    "equivariant",
+    "SE(3)",
+    "protein design",
+    "enzyme design",
+    "catalysis",
+    "G-quadruplex",
+    "G4 DNA",
+    "nucleic acid structure",
+    "AI for science"
+  ],
+  "negative_keywords": [
+    "expression of concern",
+    "retracted article"
+  ],
+  "selection_guidance": "优先直接相关、近期、研究设计清楚且结果可检验的工作。平衡方法进展与化学/生物学问题；除非与主题高度相关，否则不要优先选择纯综述、社论、勘误或仅泛泛提到 AI 的论文。关注模型是否有合理基线、数据划分是否可能泄漏、是否进行外部验证，以及代码/数据是否公开。不要因引用数高就自动选择老论文。",
+  "lookback_days": 45,
+  "maximum_lookback_days": 365,
+  "results_per_query": 20,
+  "arxiv_results_per_query": 20,
+  "max_candidates_to_llm": 12,
+  "deepseek_base_url": "https://api.deepseek.com",
+  "deepseek_model": "deepseek-flash",
+  "deepseek_timeout_seconds": 90,
+  "deepseek_max_retries": 2,
+  "summary_max_tokens": 3000,
+  "source_pause_seconds": 0.35,
+  "arxiv_pause_seconds": 3.0,
+  "history_retention_days": 730,
+  "output_dir": "reports",
+  "open_report_after_run": true,
+  "contact_email": "",
+  "full_text": {
+    "enabled": true,
+    "max_bytes": 15000000,
+    "max_pages": 18,
+    "max_chars": 28000,
+    "timeout_seconds": 30,
+    "allowed_pdf_hosts": [
+      "pmc.ncbi.nlm.nih.gov",
+      "europepmc.org",
+      "onlinelibrary.wiley.com",
+      "pubs.acs.org",
+      "nature.com"
+    ]
+  },
+  "publisher_scope": [
+    "PubMed",
+    "Nature",
+    "ACS Publications",
+    "Wiley Online Library"
+  ],
+  "minimum_journal_impact_factor": 12.0,
+  "journal_impact_factor_year": 2025,
+  "journal_metrics_file": "journal_metrics.json"
+}

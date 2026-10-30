@@ -1,0 +1,128 @@
+{
+  "metric_year": 2025,
+  "source_note": "Values transcribed from the official Nature Portfolio Journal Metrics page; the 2026 JCR release reports 2025 JIF data. This starter file only seeds selected Nature Portfolio titles. Add ACS and Wiley titles from an authorized current JCR export or official journal metric pages before expecting them to pass the strict filter. Selected ACS values are from ACS Publications journal-metrics pages (current as of 2026-06-17); selected Wiley values are from the official Wiley journal metric pages accessed 2026-10-29. Check each source page when refreshing the metric year.",
+  "journals": {
+    "Nature": {
+      "jif": 56.1,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature/journal-impact"
+    },
+    "Nature Communications": {
+      "jif": 18.1,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Catalysis": {
+      "jif": 48.3,
+      "year": 2025,
+      "source_url": "https://www.nature.com/natcatal/journal-impact"
+    },
+    "Nature Chemical Biology": {
+      "jif": 15.8,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Chemistry": {
+      "jif": 24.5,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Computational Science": {
+      "jif": 20.3,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Materials": {
+      "jif": 38.0,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Machine Intelligence": {
+      "jif": 29.8,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Methods": {
+      "jif": 28.2,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Biotechnology": {
+      "jif": 44.5,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Nanotechnology": {
+      "jif": 37.7,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Energy": {
+      "jif": 70.1,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Reviews Chemistry": {
+      "jif": 50.3,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Reviews Materials": {
+      "jif": 83.3,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Nature Reviews Methods Primers": {
+      "jif": 54.2,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "npj Computational Materials": {
+      "jif": 13.1,
+      "year": 2025,
+      "source_url": "https://www.nature.com/nature-portfolio/about-journals/journal-metrics"
+    },
+    "Journal of the American Chemical Society": {
+      "jif": 16.6,
+      "year": 2025,
+      "source_url": "https://pubs.acs.org/jacs",
+      "aliases": [
+        "J Am Chem Soc",
+        "JACS"
+      ]
+    },
+    "ACS Catalysis": {
+      "jif": 13.6,
+      "year": 2025,
+      "source_url": "https://connect.acspubs.org/UK-authors"
+    },
+    "Accounts of Chemical Research": {
+      "jif": 18.0,
+      "year": 2025,
+      "source_url": "https://pubs.acs.org/journal-metrics"
+    },
+    "Accounts of Materials Research": {
+      "jif": 14.1,
+      "year": 2025,
+      "source_url": "https://pubs.acs.org/journal-metrics"
+    },
+    "Advanced Materials": {
+      "jif": 29.1,
+      "year": 2025,
+      "source_url": "https://www.onlinelibrary.wiley.com/journal/10.1002/%28ISSN%291521-4095"
+    },
+    "Angewandte Chemie International Edition": {
+      "jif": 17.6,
+      "year": 2025,
+      "source_url": "https://onlinelibrary.wiley.com/journal/15213773",
+      "aliases": [
+        "Angew Chem Int Ed"
+      ]
+    },
+    "Advanced Science": {
+      "jif": 14.1,
+      "year": 2025,
+      "source_url": "https://advanced.onlinelibrary.wiley.com/journal/21983844"
+    }
+  }
+}
