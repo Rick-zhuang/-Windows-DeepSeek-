@@ -123,6 +123,18 @@
       "jif": 14.1,
       "year": 2025,
       "source_url": "https://advanced.onlinelibrary.wiley.com/journal/21983844"
+    },
+    "Nucleic Acids Research": {
+      "jif": 15.0,
+      "year": 2025,
+      "source_url": "https://academic.oup.com/nar/pages/About",
+      "aliases": [
+        "Nucleic Acids Res",
+        "Nucleic Acids Res.",
+        "NAR",
+        "0305-1048",
+        "1362-4962"
+      ]
     }
   }
 }

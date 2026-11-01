@@ -47,6 +47,12 @@ def load_config() -> dict[str, Any]:
     for required in ("search_queries", "keywords"):
         if not isinstance(cfg.get(required), list) or not cfg[required]:
             raise ValueError(f"config.json 中 {required} 必须是非空列表")
+    target_journals = cfg.get("target_journals", [])
+    if target_journals is None:
+        target_journals = []
+    if not isinstance(target_journals, list) or any(not isinstance(x, str) or not x.strip() for x in target_journals):
+        raise ValueError("config.json 中 target_journals 必须是字符串列表；不需要期刊限定时设为 []")
+    cfg["target_journals"] = list(dict.fromkeys(x.strip() for x in target_journals))
     cfg.setdefault("lookback_days", 45)
     cfg.setdefault("max_candidates_to_llm", 12)
     cfg.setdefault("output_dir", "reports")
@@ -113,6 +119,28 @@ def _write_report(output_dir: Path, date_name: str, paper: dict[str, Any] | None
                       f"- 指标年份不匹配排除：{impact.get('excluded_wrong_metric_year', '未知')} 篇",
                       f"- 指标文件：{impact.get('metrics_file', 'journal_metrics.json')}",
                       "未知影响因子的期刊按严格模式排除；请补充并核验 journal_metrics.json 后重试。", ""]
+            missing_targets = impact.get("target_journals_missing_metrics", [])
+            if missing_targets:
+                lines += ["### target_journals 中缺少 JIF 记录"]
+                lines += [f"- {name}" for name in missing_targets]
+                lines += ["这些期刊已参与 PubMed 检索，但由于 journal_metrics.json 缺少对应指标，不会通过 JIF 筛选。", ""]
+            wrong_year_targets = impact.get("target_journals_wrong_metric_year", [])
+            if wrong_year_targets:
+                lines += ["### target_journals 中的 JIF 年份不匹配"]
+                lines += [f"- {name}" for name in wrong_year_targets]
+                lines += [f"这些期刊的指标年份不是 {impact.get('metric_year')}，因此不会通过 JIF 筛选。请更新 journal_metrics.json。", ""]
+            unknown_names = impact.get("unknown_journal_counts", {})
+            if unknown_names:
+                lines += ["### 未匹配到 JIF 的候选期刊"]
+                lines += [f"- {name}：{count} 篇" for name, count in sorted(unknown_names.items())]
+                lines += [""]
+        pubmed_status = source_status.get("PubMed", {})
+        if pubmed_status:
+            target_names = pubmed_status.get("target_journals", [])
+            lines += ["## PubMed 检索情况",
+                      f"- 常规主题查询：{pubmed_status.get('topic_queries_succeeded', 0)}/{pubmed_status.get('topic_queries_attempted', 0)} 成功",
+                      f"- 期刊限定查询：{pubmed_status.get('target_journal_queries_succeeded', 0)}/{pubmed_status.get('target_journal_queries_attempted', 0)} 成功",
+                      f"- 目标期刊：{', '.join(target_names) if target_names else '未配置'}", ""]
         if errors:
             lines += ["## 检索错误"] + [f"- {x}" for x in errors]
         lines += ["", "请检查网络、API 状态、检索词和 agent.log。系统没有用旧论文冒充今日新文献。"]
@@ -145,8 +173,8 @@ def run(args: argparse.Namespace) -> int:
         feedback_records = load_feedback(FEEDBACK_PATH)
         feedback_weights, preference_tags = load_feedback_preferences(feedback_records)
 
-        logging.info("任务开始；时间窗=%s 天；限定来源=PubMed、Nature、ACS Publications、Wiley Online Library；JIF > %s（数据年 %s）",
-                     lookback, cfg.get("minimum_journal_impact_factor", 12.0), cfg.get("journal_impact_factor_year", 2025))
+        logging.info("任务开始；时间窗=%s 天；PubMed 期刊限定=%s；常规主题检索仍保留；来源=PubMed、Nature、ACS Publications、Wiley Online Library；JIF > %s（数据年 %s）",
+                     lookback, cfg.get("target_journals", []), cfg.get("minimum_journal_impact_factor", 12.0), cfg.get("journal_impact_factor_year", 2025))
         raw, source_status = fetch_all_candidates(cfg, lookback)
         ranked = rank_papers(raw, cfg, date.today(), feedback_weights)
         # Prefer papers with abstracts because evidence-grounded analysis needs source text.
@@ -178,6 +206,16 @@ def run(args: argparse.Namespace) -> int:
                 print(f"{i:2}. [score={paper.get('score', 0):.2f}; JIF={paper.get('journal_impact_factor', 'NA')} ({paper.get('journal_impact_factor_year', 'NA')})] {paper.get('publication_date')} | {paper.get('venue', '')} | {paper.get('title')} | {', '.join(paper.get('sources', []))}")
             f = source_status.get("impact_factor_filter", {})
             print(f"JIF 筛选：阈值 > {f.get('minimum_exclusive', cfg.get('minimum_journal_impact_factor', 12))}; 数据年={f.get('metric_year', cfg.get('journal_impact_factor_year', 2025))}; 未知 JIF 排除={f.get('excluded_unknown_jif', 'NA')}; 低于阈值排除={f.get('excluded_below_threshold', 'NA')}")
+            if f.get("target_journals"):
+                print("PubMed 期刊限定：", ", ".join(f["target_journals"]))
+            if f.get("target_journals_missing_metrics"):
+                print("警告：以下目标期刊尚未录入 JIF，将被严格筛选排除：", ", ".join(f["target_journals_missing_metrics"]))
+            if f.get("target_journals_wrong_metric_year"):
+                print("警告：以下目标期刊的 JIF 年份与配置不符，将被严格筛选排除：", ", ".join(f["target_journals_wrong_metric_year"]))
+            if f.get("unknown_journal_counts"):
+                print("未匹配到 JIF 的期刊：", "; ".join(f"{name} ({count} 篇)" for name, count in sorted(f["unknown_journal_counts"].items())))
+            pm = source_status.get("PubMed", {})
+            print(f"PubMed 查询：常规主题 {pm.get('topic_queries_succeeded', 0)}/{pm.get('topic_queries_attempted', 0)}；期刊限定 {pm.get('target_journal_queries_succeeded', 0)}/{pm.get('target_journal_queries_attempted', 0)}")
             print("检索状态：", json.dumps({k: {"queries_succeeded": v.get("queries_succeeded"), "queries_attempted": v.get("queries_attempted"), "records_received": v.get("records_received")} for k, v in source_status.items() if isinstance(v, dict)}, ensure_ascii=False))
             return 0
 
@@ -226,7 +264,7 @@ def run(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="每日科研文献 Agent v2.0")
+    parser = argparse.ArgumentParser(description="每日科研文献 Agent v3.2")
     parser.add_argument("--days", type=int, default=None, help="覆盖 config.json 的检索时间窗")
     parser.add_argument("--dry-run", action="store_true", help="只检索和排序候选，不调用 DeepSeek、不写推荐历史")
     parser.add_argument("--no-open", action="store_true", help="生成报告但不自动打开浏览器")

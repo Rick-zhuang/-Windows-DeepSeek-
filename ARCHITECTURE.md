@@ -1,4 +1,4 @@
-# Agent v2.0：架构和可靠性设计
+# Agent v3.2：架构和可靠性设计
 
 ## 工作流
 
@@ -43,3 +43,11 @@
 - Deduplication keeps the most precise date from available sources.
 - A strict, year-specific JIF filter runs after cross-source deduplication. Unknown/missing or stale metrics are excluded and counted in diagnostics. JIF values are loaded from `journal_metrics.json`; no metric is inferred from citation counts or substituted with CiteScore/SJR.
 - Offline tests cover year-only and electronic dates, precision upgrades across duplicate records, and strict JIF threshold/year behavior.
+
+## v3.2 目标期刊扩展
+
+- `config.json: target_journals` 控制 PubMed 的附加期刊限定检索；每个主题词仍执行不限期刊的基线查询，再按目标期刊追加 `"<journal title>"[ta]` 查询。期刊搜索字段依据 PubMed 官方文档的 Journal Title `[ta]` 标记。
+- 多查询可能命中同一 PMID/DOI；进入 JIF 筛选前按 DOI/来源 ID 合并记录。
+- `journal_metrics.json` 支持 `aliases`，可用全称、NLM 缩写或 ISSN 对齐 PubMed 返回的期刊名。
+- 对已配置但无指标记录的目标期刊，过滤状态会提供 `target_journals_missing_metrics`；其他未匹配期刊会列在 `unknown_journal_counts`。未知指标和指标年份不匹配依然严格排除。
+- 官方 JIF 并不提供可随意匿名调用的完整免费查询接口；因此程序只自动匹配本地已核验指标，不会从第三方估算数据自动补值。

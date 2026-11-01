@@ -1,10 +1,10 @@
-# 每日前沿文献 Agent v4.0（Windows + DeepSeek）
+# 每日前沿文献 Agent v3.2（Windows + DeepSeek）
 
 这是一个面向个人科研工作流的本地 Python 项目。默认领域为 AI × 化学/分子建模，重点包括 GNN、三维构象与结构生成、等变网络、扩散模型、AI 酶设计/催化和 G-quadruplex（G4）结构建模。
 
 它是一个“可审计的科研文献筛选助手”，不是能保证论文结论正确的自主科学家。它会保留检索来源、区分元数据/摘要/全文片段、检查模型给出的引用片段是否真实出现在输入文本中，并在 API 失败时降级，而不是把失败伪装成成功。
 
-## v4.0 有哪些改进
+## v2.0 有哪些改进
 
 - **双源检索**：PubMed + Nature + ACS Publications + Wiley Online Library。每个来源、每个查询分别统计成功/失败；一个来源失败不会自动让另一个来源的结果丢失。出版商站点 多次请求之间强制至少等待 3 秒，遵守其公开 API 使用建议。
 - **去重与日期窗口**：优先按 DOI 去重，缺少 DOI 时按规范化标题去重；对近期窗口内已推荐的论文不重复推送，必要时最多扩大到配置的历史窗口。
@@ -20,7 +20,7 @@
 
 1. 安装 Python 3.11 或更新版本：<https://www.python.org/downloads/windows/>。安装时勾选 **Add Python to PATH**。
 2. 将此项目解压到一个长期保留的目录，例如：
-   `D:\Programs\daily_paper_agent`
+   `C:\Users\你的用户名\Documents\daily_paper_agent`
 3. 双击 `setup_windows.bat`。脚本会创建 `.venv` 并安装依赖。
 4. 在 DeepSeek 开放平台创建 API Key：<https://platform.deepseek.com/>。
 5. 打开 PowerShell，执行：
@@ -38,7 +38,7 @@ PubMed / Crossref 元数据索引 不提供 API Key 也可以开始使用；如�
 **先做离线测试**（不会访问网络，也不会调用 DeepSeek）：
 
 ```powershell
-cd "D:\Programs\daily_paper_agent"
+cd "C:\Users\你的用户名\Documents\daily_paper_agent"
 .venv\Scripts\python.exe daily_paper_agent.py --self-test
 ```
 
@@ -61,17 +61,17 @@ cd "D:\Programs\daily_paper_agent"
 1. 按 `Win + R`，输入 `taskschd.msc`。
 2. 选择“创建基本任务”，例如命名为 `Daily Research Paper Agent`。
 3. 触发器选择“每天”，设置期望的本地时间，例如 08:30。
-4. 操作选择“启动程序”。程序/脚本填写 `C:\Windows\System32\cmd.exe`。
+4. 操作选择“启动程序”。程序/脚本填写 `cmd.exe`。
 5. “添加参数”填写（需要根据你的实际目录修改）：
 
    ```text
-   /c "D:\Programs\daily_paper_agent\run_now.bat"
+   /c "C:\Users\你的用户名\Documents\daily_paper_agent\run_daily.bat"
    ```
 
 6. “起始于”填写项目目录：
 
    ```text
-   D:\Programs\daily_paper_agent
+   C:\Users\你的用户名\Documents\daily_paper_agent
    ```
 
 7. 建议选择“仅当用户登录时运行”，以便报告可以打开到浏览器。电脑关机时任务无法执行；任务计划程序可配置“错过计划启动时间后尽快运行”。
@@ -91,6 +91,7 @@ cd "D:\Programs\daily_paper_agent"
 
 - `research_focus`：给 DeepSeek 的研究背景。
 - `search_queries`：PubMed / Crossref 元数据索引 检索词。
+- `target_journals`：PubMed 期刊限定检索清单。对每个 `search_queries` 主题词，程序会额外为清单中的每本期刊执行一次带 `[ta]`（Journal Title）字段限定的 PubMed 检索；原有不限期刊的主题查询仍会完整保留。设为 `[]` 即关闭期刊限定检索。期刊可使用全称、NLM 缩写或 ISSN；建议优先填写全称。
 - `arxiv_queries`：出版商站点 检索词；建议使用可检索的短语，不要写整句问题。
 - `keywords`：本地排序用的正向关键词。
 - `negative_keywords`：命中后扣分的词，适合过滤勘误/撤稿等情况；务必谨慎，避免误伤正常论文。
@@ -104,6 +105,20 @@ cd "D:\Programs\daily_paper_agent"
 - `full_text.allowed_pdf_hosts`：开放 PDF 下载白名单。只添加你信任且允许访问的学术仓储/出版社域名；程序只允许 HTTPS，并再次检查重定向域名。
 
 如果研究方向改变，建议同时修改 `search_queries`、`arxiv_queries` 和 `keywords`，不要只改标题提示词。
+
+### 目标期刊清单示例
+
+`config.json` 中目前预置了：
+
+```json
+"target_journals": [
+  "Nucleic Acids Research"
+]
+```
+
+以后增加期刊只需编辑该列表，例如加入 `RNA` 或 `Nature Structural & Molecular Biology`，不需要修改 Python 源代码。期刊限定检索会与常规主题检索并行执行，不会把常规检索限制在目标期刊内。相同文章可能被两类查询同时命中，程序会在后续阶段去重。
+
+JIF 匹配使用 `journal_metrics.json` 中的期刊名称和 `aliases` 别名。新增目标期刊如果尚无指标记录，程序会在 `agent.log`、`--dry-run` 输出及报告中明确列出，并按严格规则排除；这时需要在 `journal_metrics.json` 添加经官方来源核验、与 `journal_impact_factor_year` 同年份的 **2-year JIF**，并在 `aliases` 中补充 PubMed 可能返回的 NLM 缩写或 ISSN。程序不会凭空推测 JIF，也不会用 CiteScore、SJR 或 5-year JIF 替代。当前 `Nucleic Acids Research` 的 2025 2-year JIF 记录为 15.0，来源为 Oxford Academic 官方期刊指标页。
 
 ## 6. 成本与数据边界
 
@@ -139,6 +154,13 @@ cd "D:\Programs\daily_paper_agent"
 - **指标文件：** `journal_metrics.json` 已放入少量 Nature Portfolio、ACS 和 Wiley 期刊的起始记录，附官方指标页面链接。该表不是所有期刊的完整目录；未录入的 ACS/Wiley/PubMed 期刊会被严格排除。请依据当前 JCR/出版商官方页面核对并补齐目标期刊，不要用 CiteScore、SJR 或 5-year JIF 冒充 2-year JIF。
 - **排错：** 先运行 `python daily_paper_agent.py --dry-run`。如果没有候选，查看输出的 `excluded_unknown_jif` 与 `excluded_below_threshold`；前者过高通常意味着 `journal_metrics.json` 缺少期刊条目，而不是日期检索失败。
 
+## v3.2 目标期刊检索
+
+- 新增 `target_journals` 配置项；PubMed 对每个主题词同时执行不限期刊查询和逐本目标期刊的 `[ta]` 限定查询。
+- 目标期刊限定只作用于 PubMed，不会改变 Nature、ACS Publications、Wiley 的 Crossref 元数据发现流程。
+- JIF 匹配支持 `journal_metrics.json` 中的 `aliases`；未录入指标的目标期刊会明确告警并继续遵守严格排除规则。
+- PubMed 状态拆分统计常规主题查询与目标期刊限定查询的成功数、原始记录数。
+
 ## 8. 设计参考
 
 - [DeepSeek Chat Completions API](https://api-docs.deepseek.com/api/create-chat-completion/)
@@ -151,7 +173,7 @@ cd "D:\Programs\daily_paper_agent"
 - [Wiley Journal Metrics 说明](https://authorservices-ppd.wiley.com/author-resources/Journal-Authors/find-a-journal/journal-metrics.html)
 
 
-## v4.0 检索范围与报告结构
+## v3.0 检索范围与报告结构
 
 检索限定在 PubMed、Nature、ACS Publications、Wiley Online Library。PubMed 通过 NCBI E-utilities 搜索并取回元数据；Nature、ACS 和 Wiley 通过 Crossref 元数据搜索候选，再严格按 DOI/落地 URL 的出版商域名筛选。Crossref 在这里是元数据索引，不作为额外的目标出版商来源。由于出版商 API、索引延迟、访问权限及元数据完整性不同，这不保证覆盖对应网站的全部文章。
 

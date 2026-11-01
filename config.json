@@ -6,6 +6,9 @@
     "enzyme design machine learning catalysis",
     "G-quadruplex DNA structure prediction"
   ],
+  "target_journals": [
+    "Nucleic Acids Research"
+  ],
   "keywords": [
     "graph neural network",
     "GNN",
