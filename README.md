@@ -145,6 +145,11 @@ JIF 匹配使用 `journal_metrics.json` 中的期刊名称和 `aliases` 别名�
 
 **不自动打开浏览器：** `python daily_paper_agent.py --no-open`
 
+## v3.0 检索范围与报告结构
+
+检索限定在 PubMed、Nature、ACS Publications、Wiley Online Library。PubMed 通过 NCBI E-utilities 搜索并取回元数据；Nature、ACS 和 Wiley 通过 Crossref 元数据搜索候选，再严格按 DOI/落地 URL 的出版商域名筛选。Crossref 在这里是元数据索引，不作为额外的目标出版商来源。由于出版商 API、索引延迟、访问权限及元数据完整性不同，这不保证覆盖对应网站的全部文章。
+
+报告新增固定六节：0 摘要；1 研究背景；2 科学问题；3 研究策略、实验和结果；4 作者讨论；5 结尾总结与展望。若只有摘要/元数据可用，系统必须明确标记摘要级分析，不推断作者在全文讨论或结论中的内容。建议设置 `NCBI_API_KEY`（可选）和 `contact_email`，并遵守 NCBI E-utilities 使用规则。
 
 ## v3.1 日期与影响因子筛选修复
 
@@ -171,13 +176,6 @@ JIF 匹配使用 `journal_metrics.json` 中的期刊名称和 `aliases` 别名�
 - [Nature Portfolio 官方期刊指标](https://www.nature.com/nature-portfolio/about-journals/journal-metrics)
 - [ACS Publications 官方期刊指标](https://pubs.acs.org/journal-metrics)
 - [Wiley Journal Metrics 说明](https://authorservices-ppd.wiley.com/author-resources/Journal-Authors/find-a-journal/journal-metrics.html)
-
-
-## v3.0 检索范围与报告结构
-
-检索限定在 PubMed、Nature、ACS Publications、Wiley Online Library。PubMed 通过 NCBI E-utilities 搜索并取回元数据；Nature、ACS 和 Wiley 通过 Crossref 元数据搜索候选，再严格按 DOI/落地 URL 的出版商域名筛选。Crossref 在这里是元数据索引，不作为额外的目标出版商来源。由于出版商 API、索引延迟、访问权限及元数据完整性不同，这不保证覆盖对应网站的全部文章。
-
-报告新增固定六节：0 摘要；1 研究背景；2 科学问题；3 研究策略、实验和结果；4 作者讨论；5 结尾总结与展望。若只有摘要/元数据可用，系统必须明确标记摘要级分析，不推断作者在全文讨论或结论中的内容。建议设置 `NCBI_API_KEY`（可选）和 `contact_email`，并遵守 NCBI E-utilities 使用规则。
 
 ### MCP 是否会提升检索效果？
 MCP 是让智能体以统一协议调用外部检索工具的接口，不是新的文献数据库。若接入出版社官方 MCP（例如 Wiley Nexus 在你的账号和权限下可用），可能获得更好的结构化结果、相关段落和检索工具调用体验；但不会自动提高来源覆盖率，也不能绕过订阅/授权。PubMed 官方 E-utilities 通常更直接可控。Nature 和 ACS 是否有适合你账号的官方 MCP/API，需按当前供应商文档确认；不要把未经授权的网页抓取包装成 MCP。
